@@ -1,0 +1,23 @@
+package email
+
+// Deliberately limited typo check, NOT full RFC 5322 validation or deliverability.
+pub func Check(value: str): bool:
+    if value.len() == 0: ret true end
+    if value.len() > 254: ret false end
+    at := value.find("@")
+    if at <= 0 or at >= value.len() - 3: ret false end
+    if value.substr(0, 1) == "." or value.substr(at - 1, 1) == ".": ret false end
+    if value.substr(at + 1, 1) == ".": ret false end
+    if value.substr(value.len() - 1, 1) == ".": ret false end
+    mut dots := 0
+    repeat value.len() in i:
+        ch := value.substr(i, 1)
+        if ch == "@" and i != at: ret false end
+        if ch == " " or ch == "\t" or ch == "\r" or ch == "\n": ret false end
+        if ch == ".":
+            if i > 0 and value.substr(i - 1, 1) == ".": ret false end
+            if i > at + 1: dots += 1 end
+        end
+    end
+    ret dots > 0
+end

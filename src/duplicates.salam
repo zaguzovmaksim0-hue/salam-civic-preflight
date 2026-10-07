@@ -1,0 +1,12 @@
+package duplicates
+include normalizer "normalizer.salam"
+
+// Preserve the first physical line number for deterministic error diagnostics.
+pub func Key(text: str): str:
+    ret normalizer.UpperAscii(normalizer.Trim(text))
+end
+
+pub func FirstLine(index: HashMap<str, int>, key: str): int:
+    if index.has(key): ret index.get(key) end
+    ret 0
+end

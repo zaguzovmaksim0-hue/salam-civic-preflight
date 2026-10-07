@@ -1,0 +1,15 @@
+package postal
+include dni "dni.salam"
+
+// This is a *plausibility* check, not a Correos address lookup.
+// Spanish codes use five digits and first two digits 01..52.
+pub func Check(text: str): bool:
+    if text.len() != 5: ret false end
+    mut province := 0
+    repeat 5 in i:
+        digit := dni.Digit(text.substr(i, 1))
+        if digit < 0: ret false end
+        if i < 2: province = province * 10 + digit end
+    end
+    ret province >= 1 and province <= 52
+end

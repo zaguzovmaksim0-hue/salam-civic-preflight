@@ -1,0 +1,39 @@
+package calendar
+include dni "dni.salam"
+
+pub func Leap(year: int): bool:
+    ret year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)
+end
+
+pub func Days(year: int, month: int): int:
+    if month < 1 or month > 12: ret 0 end
+    if month == 2:
+        if Leap(year): ret 29 end
+        ret 28
+    end
+    if month == 4 or month == 6 or month == 9 or month == 11:
+        ret 30
+    end
+    ret 31
+end
+
+pub func Number(text: str, start: int, count: int): int:
+    mut num := 0
+    repeat count in i:
+        digit := dni.Digit(text.substr(start + i, 1))
+        if digit < 0: ret -1 end
+        num = num * 10 + digit
+    end
+    ret num
+end
+
+// Strict ISO YYYY-MM-DD date, Gregorian calendar, no clock/timezone inference.
+pub func Check(text: str): bool:
+    if text.len() != 10: ret false end
+    if text.substr(4, 1) != "-" or text.substr(7, 1) != "-": ret false end
+    year := Number(text, 0, 4)
+    month := Number(text, 5, 2)
+    day := Number(text, 8, 2)
+    if year <= 0 or month < 1 or month > 12: ret false end
+    ret day >= 1 and day <= Days(year, month)
+end

@@ -1,4 +1,5 @@
 package report
+
 include model "model.salam"
 
 pub func Print(counts: model.Counts):

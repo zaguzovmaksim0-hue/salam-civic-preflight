@@ -1,4 +1,5 @@
 package postal
+
 include dni "dni.salam"
 
 // This is a *plausibility* check, not a Correos address lookup.

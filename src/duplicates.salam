@@ -1,4 +1,5 @@
 package duplicates
+
 include normalizer "normalizer.salam"
 
 // Preserve the first physical line number for deterministic error diagnostics.

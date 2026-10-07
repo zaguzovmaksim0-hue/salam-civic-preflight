@@ -1,4 +1,5 @@
 package tsv
+
 include model "model.salam"
 include normalizer "normalizer.salam"
 
@@ -7,11 +8,7 @@ pub func HeaderOk(lines: Vector<str>): bool:
     mut parts := lines.get(0).split("\t")
     defer parts.free()
     if parts.len() != 5: ret false end
-    ret normalizer.Trim(parts.get(0)) == "reference" and
-        normalizer.Trim(parts.get(1)) == "document_id" and
-        normalizer.Trim(parts.get(2)) == "postal_code" and
-        normalizer.Trim(parts.get(3)) == "appointment_date" and
-        normalizer.Trim(parts.get(4)) == "email"
+    ret normalizer.Trim(parts.get(0)) == "reference" and normalizer.Trim(parts.get(1)) == "document_id" and normalizer.Trim(parts.get(2)) == "postal_code" and normalizer.Trim(parts.get(3)) == "appointment_date" and normalizer.Trim(parts.get(4)) == "email"
 end
 
 pub func Parse(lines: Vector<str>): Vector<model.Entry>:

@@ -19,5 +19,6 @@ pub struct Counts:
     pub postcodes: int = 0
     pub dates: int = 0
     pub emails: int = 0
+    pub references: int = 0
     pub duplicate_references: int = 0
 end

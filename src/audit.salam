@@ -1,0 +1,73 @@
+package audit
+include model "model.salam"
+include document "document.salam"
+include postal "postal.salam"
+include calendar "calendar.salam"
+include email "email.salam"
+include duplicates "duplicates.salam"
+
+// Each diagnostic reveals a physical line number and field name, no PII.
+// Hash keys exist only in memory for the duration of the check.
+pub func Inspect(entries: Vector<model.Entry>): model.Counts:
+    mut counts := model.Counts { rows = entries.len() }
+    mut seen := HashMap {} as HashMap<str, int>
+    defer seen.free()
+    repeat entries.len() in i:
+        entry := entries.get(i)
+        mut bad := false
+        if entry.fields != 5:
+            println "ERROR line ", entry.line, ": expected exactly five TSV fields"
+            counts.malformed += 1
+            counts.problems += 1
+            bad = true
+        else:
+            key := duplicates.Key(entry.reference)
+            if key.len() == 0:
+                println "ERROR line ", entry.line, ": empty reference"
+                counts.references += 1
+                counts.problems += 1
+                bad = true
+            else:
+                first := duplicates.FirstLine(seen, key)
+                if first > 0:
+                    println "ERROR line ", entry.line, ": repeated reference; first seen at line ", first
+                    counts.duplicate_references += 1
+                    counts.problems += 1
+                    bad = true
+                else:
+                    seen.put(key, entry.line)
+                end
+            end
+            if not document.Check(entry.document):
+                println "ERROR line ", entry.line, ": invalid DNI/NIE shape or control letter"
+                counts.identity += 1
+                counts.problems += 1
+                bad = true
+            end
+            if not postal.Check(entry.postal):
+                println "ERROR line ", entry.line, ": invalid Spanish postcode syntax/province prefix"
+                counts.postcodes += 1
+                counts.problems += 1
+                bad = true
+            end
+            if not calendar.Check(entry.appointment):
+                println "ERROR line ", entry.line, ": invalid ISO Gregorian appointment date"
+                counts.dates += 1
+                counts.problems += 1
+                bad = true
+            end
+            if not email.Check(entry.email):
+                println "ERROR line ", entry.line, ": email typography needs review"
+                counts.emails += 1
+                counts.problems += 1
+                bad = true
+            end
+        end
+        if not bad: counts.valid += 1 end
+    end
+    if counts.rows == 0:
+        println "ERROR: no records to inspect"
+        counts.problems += 1
+    end
+    ret counts
+end

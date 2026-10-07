@@ -1,0 +1,23 @@
+package report
+include model "model.salam"
+
+pub func Print(counts: model.Counts):
+    println ""
+    println "Civic Preflight | offline validation summary"
+    println "Records: ", counts.rows
+    println "Rows without detected issues: ", counts.valid
+    println "Total issue occurrences: ", counts.problems
+    println "Malformed rows: ", counts.malformed
+    println "Empty references: ", counts.references
+    println "Duplicate references: ", counts.duplicate_references
+    println "DNI/NIE checks: ", counts.identity
+    println "Postcode checks: ", counts.postcodes
+    println "Date checks: ", counts.dates
+    println "Email checks: ", counts.emails
+    if counts.problems == 0:
+        println "Result: PASS"
+    else:
+        println "Result: REVIEW"
+    end
+    println "Note: check digits and formats never prove identity, address or booking."
+end

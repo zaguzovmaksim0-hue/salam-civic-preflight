@@ -1,0 +1,23 @@
+package model
+
+pub struct Entry:
+    pub line: int = 0
+    pub fields: int = 0
+    pub reference: str = ""
+    pub document: str = ""
+    pub postal: str = ""
+    pub appointment: str = ""
+    pub email: str = ""
+end
+
+pub struct Counts:
+    pub rows: int = 0
+    pub valid: int = 0
+    pub problems: int = 0
+    pub malformed: int = 0
+    pub identity: int = 0
+    pub postcodes: int = 0
+    pub dates: int = 0
+    pub emails: int = 0
+    pub duplicate_references: int = 0
+end

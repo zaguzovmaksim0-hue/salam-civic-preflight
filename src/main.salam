@@ -1,0 +1,24 @@
+package main
+import os
+include cli "cli.salam"
+include model "model.salam"
+
+func main:
+    mut args := os.Args()
+    defer args.free()
+    if args.len() == 2 and args.get(1) == "--help":
+        cli.Help()
+        ret 0
+    end
+    if args.len() == 2 and args.get(1) == "--version":
+        println "Civic Preflight 0.1.0"
+        ret 0
+    end
+    if args.len() != 2:
+        cli.Help()
+        ret 2
+    end
+    println "Civic Preflight — validation engine initialization"
+    println "Input path: ", args.get(1)
+    ret 0
+end

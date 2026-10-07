@@ -1,0 +1,12 @@
+package cli
+
+pub func Help():
+    println "Civic Preflight - offline Spanish form field checks"
+    println "Usage: civic-preflight <records.tsv>"
+    println "       civic-preflight --help | --version"
+    println ""
+    println "Expected TSV header: reference, document_id, postal_code, appointment_date, email"
+    println "Validates format and check digits only; does not verify identity or residency."
+    println "Records stay on-device; personal data is never printed in reports."
+    println "Exit: 0 clean/help, 1 invalid records, 2 input/usage error."
+end

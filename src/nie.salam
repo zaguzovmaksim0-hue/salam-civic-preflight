@@ -1,0 +1,16 @@
+package nie
+include dni "dni.salam"
+
+// Ministry of Interior: X=0, Y=1, Z=2, seven digits, mod 23 letter.
+pub func Check(text: str): bool:
+    if text.len() != 9: ret false end
+    prefix := "XYZ".find(text.substr(0, 1))
+    if prefix < 0: ret false end
+    mut number := prefix
+    repeat 7 in i:
+        digit := dni.Digit(text.substr(i + 1, 1))
+        if digit < 0: ret false end
+        number = number * 10 + digit
+    end
+    ret text.substr(8, 1) == dni.Letter(number)
+end

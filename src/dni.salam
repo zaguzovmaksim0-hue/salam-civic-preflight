@@ -1,0 +1,22 @@
+package dni
+
+pub func Digit(char: str): int:
+    if char.len() != 1: ret -1 end
+    ret "0123456789".find(char)
+end
+
+pub func Letter(value: int): str:
+    ret "TRWAGMYFPDXBNJZSQVHLCKE".substr(value % 23, 1)
+end
+
+// Ministry of Interior 8 digits + check letter, mod 23.
+pub func Check(text: str): bool:
+    if text.len() != 9: ret false end
+    mut number := 0
+    repeat 8 in i:
+        digit := Digit(text.substr(i, 1))
+        if digit < 0: ret false end
+        number = number * 10 + digit
+    end
+    ret text.substr(8, 1) == Letter(number)
+end

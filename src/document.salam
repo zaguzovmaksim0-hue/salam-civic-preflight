@@ -1,0 +1,23 @@
+package document
+include dni "dni.salam"
+include nie "nie.salam"
+include normalizer "normalizer.salam"
+
+// A valid control letter proves only format/integrity, never real identity.
+pub func Check(value: str): bool:
+    text := normalizer.UpperAscii(normalizer.Trim(value))
+    if text.len() != 9: ret false end
+    first := text.substr(0, 1)
+    if first == "X" or first == "Y" or first == "Z":
+        ret nie.Check(text)
+    end
+    ret dni.Check(text)
+end
+
+pub func Kind(value: str): str:
+    text := normalizer.UpperAscii(normalizer.Trim(value))
+    if text.len() == 0: ret "empty" end
+    first := text.substr(0, 1)
+    if first == "X" or first == "Y" or first == "Z": ret "NIE" end
+    ret "DNI"
+end

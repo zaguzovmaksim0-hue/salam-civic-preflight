@@ -1,0 +1,34 @@
+name: Offline native verification
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Salam v0.5.0 compiler
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .cache/toolchain
+          curl -fLsS --retry 3 \
+            -o .cache/toolchain/salam.tar.gz \
+            https://github.com/SalamLang/Salam/releases/download/v0.5.0/salam-0.5.0-linux-x86_64.tar.gz
+          echo '8bdaeb08bde800b616520eedde4706bb621cf85bc05a8e4be9a8c0b193fcc363  .cache/toolchain/salam.tar.gz' | sha256sum --check
+          tar -xzf .cache/toolchain/salam.tar.gz -C .cache/toolchain
+          .cache/toolchain/salam-linux-x86_64/salam version --short
+      - name: Build and run privacy regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          .cache/toolchain/salam-linux-x86_64/salam build src/main.salam \
+            --backend=c --cc=gcc --output=.cache/civic-preflight
+          python3 tests/verify.py .cache/civic-preflight
+      - name: Check whitespace integrity
+        run: git diff --check

@@ -1,7 +1,8 @@
 package main
 import os
 include cli "cli.salam"
-include model "model.salam"
+include loader "loader.salam"
+include tsv "tsv.salam"
 
 func main:
     mut args := os.Args()
@@ -18,7 +19,19 @@ func main:
         cli.Help()
         ret 2
     end
-    println "Civic Preflight — validation engine initialization"
-    println "Input path: ", args.get(1)
+    mut read_ok := false
+    mut lines := loader.Load(args.get(1), read_ok)
+    defer lines.free()
+    if not read_ok:
+        println "ERROR: cannot read source (missing, too large, or invalid binary)"
+        ret 2
+    end
+    if not tsv.HeaderOk(lines):
+        println "ERROR: expected TSV header: reference, document_id, postal_code, appointment_date, email"
+        ret 2
+    end
+    mut records := tsv.Parse(lines)
+    defer records.free()
+    println "Civic Preflight: parsed rows: ", records.len()
     ret 0
 end

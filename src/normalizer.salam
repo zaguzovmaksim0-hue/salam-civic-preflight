@@ -1,0 +1,20 @@
+package normalizer
+import str
+
+pub func Trim(text: str): str:
+    ret str.TrimLeft(str.TrimRight(text))
+end
+
+// Normalize ASCII case only. DNI, NIE and reference identifiers use ASCII.
+pub func UpperAscii(text: str): str:
+    mut result := ""
+    repeat text.len() in i:
+        mut ch := text.substr(i, 1)
+        at := "abcdefghijklmnopqrstuvwxyz".find(ch)
+        if at >= 0:
+            ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".substr(at, 1)
+        end
+        result = result.concat(ch)
+    end
+    ret result
+end

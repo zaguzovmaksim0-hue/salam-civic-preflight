@@ -1,0 +1,33 @@
+package loader
+import os
+import io
+
+// Cap input to 2 MiB; never mutate, upload or echo its contents.
+pub func Load(path: str, opened &: bool): Vector<str>:
+    mut lines := Vector {} as Vector<str>
+    opened = false
+    if os.IsDir(path): ret lines end
+    size := os.FileSize(path)
+    if size < 0 or size > 2097152: ret lines end
+    handle := os.Open(path, "rb")
+    if handle == null: ret lines end
+    mut content := io.ReadAll(handle)
+    io.Close(handle)
+    if (content.len() as i64) != size: ret lines end
+    if content.len() >= 3 and content.substr(0, 3) == "﻿":
+        content = content.substr(3, content.len() - 3)
+    end
+    opened = true
+    if content.len() == 0: ret lines end
+    mut raw := content.split("\n")
+    defer raw.free()
+    repeat raw.len() in i:
+        mut line := raw.get(i)
+        if i == raw.len() - 1 and line.len() == 0: break end
+        if line.len() > 0 and line.substr(line.len() - 1, 1) == "\r":
+            line = line.substr(0, line.len() - 1)
+        end
+        lines.push(line)
+    end
+    ret lines
+end

@@ -20,7 +20,7 @@ pub func Parse(lines: Vector<str>): Vector<model.Entry>:
         if i == 0: continue end
         raw := lines.get(i)
         if normalizer.Trim(raw).len() == 0: continue end
-        if normalizer.Trim(raw).substr(0, 1) == "#": continue end
+        if raw.find("\t") < 0 and normalizer.Trim(raw).substr(0, 1) == "#": continue end
         mut columns := raw.split("\t")
         defer columns.free()
         mut entry := model.Entry { line = i + 1, fields = columns.len() }

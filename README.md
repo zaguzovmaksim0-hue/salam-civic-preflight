@@ -17,6 +17,19 @@ salam build src/main.salam --backend=c --cc=gcc --output=.cache/civic-preflight
 python3 tests/verify.py .cache/civic-preflight
 ```
 
+### Reproducible Docker build (Linux x86-64)
+
+Docker is optional. It builds the real Salam CLI from the official **v0.5.0** x86-64 release, verifies the archive's pinned SHA-256 **before extracting it**, and runs the same 67 native regression checks inside the builder. The runtime image contains only the compiled CLI and runtime libraries, not the compiler or development files.
+
+```sh
+docker build --tag civic-preflight:local .
+docker run --rm --network none --read-only --cap-drop ALL \
+  --volume "${PWD}/examples:/inputs:ro" \
+  civic-preflight:local /inputs/sample.tsv
+```
+
+The sample records are synthetic. To validate your own authorized TSV, replace the volume's source directory and input file path; keep the mount read-only. The final container runs without networking as an unprivileged numeric user. GitHub Actions independently verifies the Docker build and both clean/invalid fixtures. The pinned prebuilt toolchain makes this Dockerfile a **Linux x86-64** recipe, not a claim of native ARM64 Docker support.
+
 On Windows, change the output to a native `.exe` and run using Windows path conventions. The verified build environment is Linux ARM64 (Debian userspace on Android Termux), Salam 0.5.0, GCC and Python 3. The GitHub Actions Linux x64 job runs the same source-level tests.
 
 ## File format

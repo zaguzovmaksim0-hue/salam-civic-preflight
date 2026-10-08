@@ -32,3 +32,33 @@ jobs:
           python3 tests/verify.py .cache/civic-preflight
       - name: Check whitespace integrity
         run: git diff --check
+
+  docker-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build container with SHA-pinned Salam and run native test suite
+        run: |
+          set -euo pipefail
+          docker build --pull --tag civic-preflight:ci .
+      - name: Run immutable no-network container with a valid synthetic TSV
+        run: |
+          set -euo pipefail
+          docker run --rm --network none --read-only --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --volume "${PWD}/examples:/inputs:ro" \
+            civic-preflight:ci /inputs/sample.tsv
+      - name: Reject invalid TSV with expected code and no source changes
+        run: |
+          set -euo pipefail
+          set +e
+          docker run --rm --network none --read-only --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --volume "${PWD}/examples:/inputs:ro" \
+            civic-preflight:ci /inputs/review.tsv > review-output.txt
+          result=$?
+          set -e
+          test "$result" -eq 1
+          grep -q 'Result: REVIEW' review-output.txt
+          ! grep -q '12345678A' review-output.txt

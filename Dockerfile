@@ -1,6 +1,6 @@
 # Build with a compiler release pinned and verified by SHA-256.
 # Runtime: no Salam toolchain, no package manager, no network access needed.
-FROM debian:bookworm-slim AS builder
+FROM debian:trixie-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl gcc libc6-dev python3 \
@@ -28,7 +28,7 @@ RUN mkdir -p .cache \
        --backend=c --cc=/usr/bin/gcc --output=.cache/civic-preflight \
   && python3 tests/verify.py .cache/civic-preflight
 
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 COPY --from=builder /app/.cache/civic-preflight /usr/local/bin/civic-preflight
 USER 65532:65532
 WORKDIR /work
